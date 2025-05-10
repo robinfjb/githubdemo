@@ -13,7 +13,7 @@
 - 优雅的错误处理，如网络中断时的提示
 
 ## Download
-https://github.com/robinfjb/githubdemo/blob/main/release/app-release.apk
+[![Download APK](https://img.shields.io/badge/Download-APK-green.svg)](https://github.com/robinfjb/githubdemo/releases/download/V0.1/app-release.apk)
 
 ## Screenshots
 ![Screenshot 1](screenshots/1.png) ![Screenshot 2](screenshots/2.png) ![Screenshot 3](screenshots/3.png) ![Screenshot 4](screenshots/4.png) ![Screenshot 5](screenshots/5.png) ![Screenshot 6](screenshots/6.png) ![Screenshot 7](screenshots/7.png)
