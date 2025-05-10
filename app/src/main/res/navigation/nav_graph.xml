@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.githubdemo.ui.home.HomeFragment"
+        android:label="@string/nav_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_repositoryDetailFragment"
+            app:destination="@id/repositoryDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.githubdemo.ui.search.SearchFragment"
+        android:label="@string/nav_search"
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_repositoryDetailFragment"
+            app:destination="@id/repositoryDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.githubdemo.ui.profile.ProfileFragment"
+        android:label="@string/nav_profile"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_repositoryDetailFragment"
+            app:destination="@id/repositoryDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/repositoryDetailFragment"
+        android:name="com.example.githubdemo.ui.repository.RepositoryDetailFragment"
+        android:label="@string/view_repository"
+        tools:layout="@layout/fragment_repository_detail">
+        <argument
+            android:name="ownerLogin"
+            app:argType="string" />
+        <argument
+            android:name="repoName"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_repositoryDetailFragment_to_createIssueFragment"
+            app:destination="@id/createIssueFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createIssueFragment"
+        android:name="com.example.githubdemo.ui.repository.CreateIssueFragment"
+        android:label="@string/create_issue"
+        tools:layout="@layout/fragment_create_issue">
+        <argument
+            android:name="ownerLogin"
+            app:argType="string" />
+        <argument
+            android:name="repoName"
+            app:argType="string" />
+    </fragment>
+</navigation> 

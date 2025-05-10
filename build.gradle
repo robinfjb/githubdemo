@@ -1,0 +1,28 @@
+// Top-level build file
+buildscript {
+    ext {
+        kotlin_version = '1.8.10'
+        coroutines_version = '1.6.4'
+        lifecycle_version = '2.6.1'
+        nav_version = '2.5.3'
+        room_version = '2.5.1'
+        retrofit_version = '2.9.0'
+        okhttp_version = '4.10.0'
+        glide_version = '4.15.1'
+    }
+
+    repositories {
+        maven{url 'https://maven.aliyun.com/repository/google'}
+        maven{url 'https://maven.aliyun.com/repository/public'}
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+} 

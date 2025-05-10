@@ -1,0 +1,100 @@
+<resources>
+    <string name="app_name">GitHub Demo</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">首页</string>
+    <string name="nav_search">搜索</string>
+    <string name="nav_profile">个人资料</string>
+    
+    <!-- Auth -->
+    <string name="login">登录</string>
+    <string name="logout">退出登录</string>
+    <string name="login_with_github">使用GitHub账号登录</string>
+    <string name="github_callback_url">githubdemo://callback</string>
+    <string name="logout_success">已成功退出登录</string>
+    <string name="github_login">GitHub 登录</string>
+    <string name="auth_loading">正在授权中...</string>
+    <string name="auth_success">授权成功</string>
+    <string name="auth_failed">授权失败</string>
+    <string name="logout_confirmation_title">确认退出登录</string>
+    <string name="logout_confirmation_message">您确定要退出登录吗？</string>
+    
+    <!-- Home -->
+    <string name="trending_repositories">热门仓库</string>
+    <string name="trending_topics">热门话题</string>
+    <string name="view_all">查看全部</string>
+    <string name="stars">星标</string>
+    <string name="forks">分支</string>
+    <string name="issues">问题</string>
+    <string name="view_repository">查看仓库</string>
+    
+    <!-- Search -->
+    <string name="search_hint">搜索仓库...</string>
+    <string name="filter_by_language">按语言筛选</string>
+    <string name="sort_by_stars">按星标数排序</string>
+    <string name="no_results">没有找到结果</string>
+    <string name="search_repositories">搜索仓库</string>
+    <string name="popular_languages">热门语言</string>
+    <string name="search_results">搜索结果</string>
+    <string name="no_more_results">没有更多数据了</string>
+    
+    <!-- Profile -->
+    <string name="repositories">仓库</string>
+    <string name="followers">关注者</string>
+    <string name="following">正在关注</string>
+    <string name="not_logged_in">未登录</string>
+    <string name="login_to_see_profile">登录以查看您的个人资料</string>
+    <string name="my_repositories">我的仓库</string>
+    
+    <!-- Repository -->
+    <string name="open_issues">创建问题</string>
+    <string name="create_issue">创建问题</string>
+    <string name="issue_title">问题标题</string>
+    <string name="issue_body">问题描述</string>
+    <string name="submit">提交</string>
+    <string name="success">成功</string>
+    <string name="issue_created">问题已创建</string>
+    <string name="repository_info">仓库信息</string>
+    <string name="repository_issues">仓库问题</string>
+    <string name="error_loading_issue">加载问题失败</string>
+    
+    <!-- Errors -->
+    <string name="error_loading_data">加载数据失败</string>
+    <string name="error_network">网络错误</string>
+    <string name="error_server">服务器错误</string>
+    <string name="error_auth">身份验证失败</string>
+    <string name="retry">重试</string>
+    <string name="unknown_error">未知错误</string>
+    <string name="empty_field_error">此字段不能为空</string>
+    
+    <!-- 通用 -->
+    <string name="loading">加载中...</string>
+    <string name="error_icon">错误图标</string>
+    <string name="no_description">没有描述</string>
+    
+    <!-- 仓库详情 -->
+    <string name="error_loading_repository">加载仓库失败</string>
+    <string name="open_in_browser">在浏览器中打开</string>
+    <string name="no_issues">暂无问题</string>
+    
+    <!-- 创建问题 -->
+    <string name="issue_description">问题描述 (支持 Markdown 格式)</string>
+    <string name="submit_issue">提交问题</string>
+    <string name="markdown_guide">Markdown 格式指南</string>
+    <string name="markdown_guide_text">- **粗体文本** 使用 **文本**\n- *斜体文本* 使用 *文本*\n- `代码` 使用 `代码`\n- 列表项使用 - 或 *\n- [链接](URL) 使用 [文本](URL)</string>
+    <string name="bold">粗体</string>
+    <string name="italic">斜体</string>
+    <string name="code">代码</string>
+    
+    <!-- 添加话题详情相关字符串 -->
+    <string name="created_by">创建者:</string>
+    <string name="released">发布于:</string>
+    
+    <!-- 退出应用相关字符串 -->
+    <string name="press_again_to_exit">再按一次返回键确认退出</string>
+    <string name="exit_app">退出应用</string>
+    <string name="confirm_exit">确定要退出应用吗？</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="back">返回</string>
+</resources> 

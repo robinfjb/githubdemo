@@ -1,0 +1,97 @@
+package com.example.githubdemo.ui.profile.adapter
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.githubdemo.R
+import com.example.githubdemo.data.model.Repository
+import com.example.githubdemo.databinding.ItemRepositoryBinding
+
+/**
+ * 仓库适配器，用于个人资料页
+ */
+class RepositoryAdapter(
+    private val onItemClick: (Repository) -> Unit
+) : ListAdapter<Repository, RepositoryAdapter.ViewHolder>(RepoDiffCallback()) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemRepositoryBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return ViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val repository = getItem(position)
+        holder.bind(repository)
+    }
+
+    inner class ViewHolder(private val binding: ItemRepositoryBinding) : 
+        RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            binding.root.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClick(getItem(position))
+                }
+            }
+        }
+
+        fun bind(repository: Repository) {
+            binding.apply {
+                repoNameTextView.text = repository.name
+                repoDescriptionTextView.text = repository.description ?: ""
+                ownerNameTextView.text = repository.owner.login
+                
+                // 设置语言标签
+                if (repository.language != null) {
+                    languageChip.text = repository.language
+                    languageChip.visibility = android.view.View.VISIBLE
+                } else {
+                    languageChip.visibility = android.view.View.GONE
+                }
+                
+                // 设置星标数
+                starsTextView.text = formatNumber(repository.stars)
+                
+                // 加载头像
+                Glide.with(ownerAvatarImageView.context)
+                    .load(repository.owner.avatarUrl)
+                    .placeholder(R.drawable.ic_person)
+                    .error(R.drawable.ic_person)
+                    .circleCrop()
+                    .into(ownerAvatarImageView)
+            }
+        }
+        
+        /**
+         * 格式化数字，大于1000显示为k
+         */
+        private fun formatNumber(number: Int): String {
+            return when {
+                number >= 1_000_000 -> String.format("%.1fM", number / 1_000_000f)
+                number >= 1_000 -> String.format("%.1fk", number / 1_000f)
+                else -> number.toString()
+            }
+        }
+    }
+}
+
+/**
+ * 仓库差异回调
+ */
+class RepoDiffCallback : DiffUtil.ItemCallback<Repository>() {
+    override fun areItemsTheSame(oldItem: Repository, newItem: Repository): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    override fun areContentsTheSame(oldItem: Repository, newItem: Repository): Boolean {
+        return oldItem == newItem
+    }
+} 

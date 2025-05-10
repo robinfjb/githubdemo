@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.GitHubDemo" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/github_blue</item>
+        <item name="colorPrimaryDark">@color/github_black</item>
+        <item name="colorAccent">@color/github_green</item>
+        <item name="android:statusBarColor">@color/github_black</item>
+        <item name="android:navigationBarColor">@color/github_bg</item>
+    </style>
+    
+</resources> 
