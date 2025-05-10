@@ -1,0 +1,96 @@
+@startuml 简化类图
+
+' 设置主题
+!theme plain
+skinparam backgroundColor white
+skinparam classFontSize 16
+skinparam classFontName Microsoft YaHei
+skinparam classAttributeFontSize 14
+skinparam noteBackgroundColor #f0f0f0
+skinparam noteBorderColor #d0d0d0
+skinparam packageStyle rectangle
+
+package "UI 层" {
+  abstract class "Fragment" as Fragment
+  
+  class "HomeFragment" as HomeFragment
+  class "SearchFragment" as SearchFragment  
+  class "ProfileFragment" as ProfileFragment
+}
+
+package "ViewModel 层" {
+  abstract class "ViewModel" as ViewModel
+  
+  class "HomeViewModel" as HomeViewModel
+  class "SearchViewModel" as SearchViewModel
+  class "ProfileViewModel" as ProfileViewModel
+  class "AuthViewModel" as AuthViewModel
+}
+
+package "仓库层" {
+  interface "GitHubRepository" as GitHubRepository
+  class "GitHubRepositoryImpl" as GitHubRepositoryImpl
+  
+  interface "AuthRepository" as AuthRepository
+  class "AuthRepositoryImpl" as AuthRepositoryImpl
+}
+
+package "网络层" {
+  interface "GitHubService" as GitHubService
+  interface "AuthService" as AuthService
+}
+
+package "数据层" {
+  class "GitHubDatabase" as GitHubDatabase
+  class "TokenManager" as TokenManager
+}
+
+' 继承关系
+Fragment <|-- HomeFragment
+Fragment <|-- SearchFragment
+Fragment <|-- ProfileFragment
+
+ViewModel <|-- HomeViewModel
+ViewModel <|-- SearchViewModel
+ViewModel <|-- ProfileViewModel
+ViewModel <|-- AuthViewModel
+
+GitHubRepository <|.. GitHubRepositoryImpl
+AuthRepository <|.. AuthRepositoryImpl
+
+' 依赖关系
+HomeFragment --> HomeViewModel
+SearchFragment --> SearchViewModel
+ProfileFragment --> ProfileViewModel
+ProfileFragment ..> AuthViewModel
+
+HomeViewModel --> GitHubRepository
+SearchViewModel --> GitHubRepository
+ProfileViewModel --> GitHubRepository
+ProfileViewModel --> AuthRepository
+AuthViewModel --> AuthRepository
+
+GitHubRepositoryImpl --> GitHubService
+GitHubRepositoryImpl --> GitHubDatabase
+AuthRepositoryImpl --> AuthService
+AuthRepositoryImpl --> TokenManager
+
+' 布局调整
+ViewModel -[hidden]> Fragment
+GitHubRepository -[hidden]> ViewModel
+GitHubService -[hidden]> GitHubRepository
+
+' 说明注释
+note right of GitHubRepositoryImpl
+  实现Repository接口
+  连接网络层和UI层
+  提供数据缓存机制
+end note
+
+note right of AuthRepositoryImpl
+  处理用户认证
+  管理用户登录状态
+  保存用户令牌
+end note
+
+@enduml 

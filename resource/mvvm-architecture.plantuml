@@ -1,0 +1,134 @@
+@startuml MVVM架构类图
+
+' 设置主题
+!theme plain
+skinparam backgroundColor white
+skinparam classFontSize 16
+skinparam classFontName Microsoft YaHei
+skinparam classAttributeFontSize 14
+skinparam arrowColor #666666
+skinparam packageStyle rectangle
+
+' 定义层级
+package "View" as View {
+  abstract class "Fragment" as Fragment
+  
+  class "HomeFragment" as HomeFragment
+  class "SearchFragment" as SearchFragment
+  class "ProfileFragment" as ProfileFragment
+}
+
+package "ViewModel" as ViewModelLayer {
+  abstract class "ViewModel" as ViewModel
+  
+  class "HomeViewModel" as HomeViewModel {
+    - gitHubRepository: GitHubRepository
+    + trendingRepositories: LiveData<List<Repository>>
+    + featuredTopics: LiveData<List<Topic>>
+    + loadData()
+  }
+  
+  class "SearchViewModel" as SearchViewModel {
+    - gitHubRepository: GitHubRepository
+    + searchResults: LiveData<List<Repository>>
+    + search()
+  }
+  
+  class "ProfileViewModel" as ProfileViewModel {
+    - authRepository: AuthRepository
+    - gitHubRepository: GitHubRepository
+    + userData: LiveData<ProfileUIModel>
+    + getUserProfile()
+  }
+}
+
+package "Model" as Model {
+  package "Repository" as RepositoryLayer {
+    interface "GitHubRepository" as GitHubRepository {
+      + getTrendingRepositories()
+      + searchRepositories()
+      + getUserProfile()
+    }
+    
+    interface "AuthRepository" as AuthRepository {
+      + getAccessToken()
+      + isLoggedIn()
+      + logout()
+    }
+    
+    class "GitHubRepositoryImpl" as GitHubRepositoryImpl
+    class "AuthRepositoryImpl" as AuthRepositoryImpl
+  }
+  
+  package "DataSource" as DataSource {
+    package "Remote" {
+      interface "GitHubService" as GitHubService
+      interface "AuthService" as AuthService
+    }
+    
+    package "Local" {
+      class "GitHubDatabase" as GitHubDatabase
+      class "TokenManager" as TokenManager
+    }
+  }
+}
+
+' 定义关系
+' View 和 ViewModel 的关系
+HomeFragment --> HomeViewModel: 观察
+SearchFragment --> SearchViewModel: 观察
+ProfileFragment --> ProfileViewModel: 观察
+
+' ViewModel 和 Repository 的关系
+HomeViewModel --> GitHubRepository: 使用
+SearchViewModel --> GitHubRepository: 使用
+ProfileViewModel --> GitHubRepository: 使用
+ProfileViewModel --> AuthRepository: 使用
+
+' Repository 和 DataSource 的关系
+GitHubRepository <|.. GitHubRepositoryImpl
+AuthRepository <|.. AuthRepositoryImpl
+
+GitHubRepositoryImpl --> GitHubService: 网络请求
+GitHubRepositoryImpl --> GitHubDatabase: 本地缓存
+AuthRepositoryImpl --> AuthService: 认证请求
+AuthRepositoryImpl --> TokenManager: 令牌管理
+
+' 添加说明
+note top of View
+  视图层负责UI展示和用户交互
+  通过观察ViewModel获取数据
+end note
+
+note top of ViewModelLayer
+  视图模型层处理UI逻辑
+  将Model层数据转换为UI可用的数据
+  提供LiveData给View层观察
+end note
+
+note top of Model
+  模型层负责数据处理逻辑
+  包括数据获取、缓存和业务规则
+end note
+
+note right of GitHubRepository
+  定义GitHub相关数据操作接口
+  提供统一的数据访问方式
+end note
+
+note right of AuthRepository
+  定义认证相关操作接口
+  处理用户登录状态
+end note
+
+note bottom of Remote
+  处理网络请求
+  与GitHub API交互
+end note
+
+note bottom of Local
+  管理本地数据
+  提供离线访问能力
+end note
+
+@enduml 

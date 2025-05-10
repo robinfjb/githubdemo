@@ -1,0 +1,320 @@
+@startuml GitHub Demo 类图
+
+' 设置主题
+!theme plain
+skinparam backgroundColor white
+skinparam classFontSize 14
+skinparam classFontName Microsoft YaHei
+skinparam classAttributeFontSize 12
+skinparam noteBackgroundColor #f0f0f0
+skinparam noteBorderColor #d0d0d0
+
+package "UI 层" {
+  abstract class "Fragment" as Fragment
+
+  class "MainActivity" as MainActivity {
+    - binding: ActivityMainBinding
+    - mainFragments: List<String>
+    + onCreate()
+    + onNewIntent()
+    - handleAuthIntent()
+    - setupBottomNavigation()
+    - loadFragment()
+    - confirmExitOrNavigateBack()
+  }
+
+  class "HomeFragment" as HomeFragment {
+    - binding: FragmentHomeBinding
+    - repositoryAdapter: RepositoryCardAdapter
+    - topicAdapter: TopicAdapter
+    - viewModel: HomeViewModel
+    + onCreateView()
+    + onViewCreated()
+    - setupRecyclerViews()
+    - setupClickListeners()
+    - observeViewModel()
+    - loadData()
+  }
+
+  class "SearchFragment" as SearchFragment {
+    - binding: FragmentSearchBinding
+    - repositoryAdapter: RepositoryAdapter
+    - viewModel: SearchViewModel
+    - isLoadingMore: Boolean
+    + onCreateView()
+    + onViewCreated()
+    - setupRecyclerView()
+    - setupSearchInput()
+    - setupLanguageChips()
+    - observeViewModel()
+    - loadMoreResults()
+  }
+
+  class "ProfileFragment" as ProfileFragment {
+    - binding: FragmentProfileBinding
+    - viewModel: ProfileViewModel
+    - repositoryAdapter: RepositoryAdapter
+    + onCreateView()
+    + onViewCreated()
+    - setupUI()
+    - observeViewModel()
+    - handleUserState()
+    - login()
+    - logout()
+  }
+
+  class "RepositoryDetailFragment" as RepositoryDetailFragment {
+    - binding: FragmentRepositoryDetailBinding
+    - viewModel: RepositoryViewModel
+    - owner: String
+    - repo: String
+    + onCreateView()
+    + onViewCreated()
+    - loadRepositoryDetails()
+    - setupUI()
+    - observeViewModel()
+  }
+}
+
+package "ViewModel 层" {
+  abstract class "ViewModel" as ViewModel
+
+  class "HomeViewModel" as HomeViewModel {
+    - gitHubRepository: GitHubRepository
+    + trendingRepositories: LiveData<List<Repository>>
+    + featuredTopics: LiveData<List<Topic>>
+    + loading: LiveData<Boolean>
+    + error: LiveData<Boolean>
+    + loadData()
+  }
+
+  class "SearchViewModel" as SearchViewModel {
+    - gitHubRepository: GitHubRepository
+    - _searchResults: MutableLiveData<List<Repository>>
+    + searchResults: LiveData<List<Repository>>
+    - _isLoading: MutableLiveData<Boolean>
+    + isLoading: LiveData<Boolean>
+    - _currentPage: MutableLiveData<Int>
+    - _query: MutableLiveData<String>
+    + hasMoreData: LiveData<Boolean>
+    + search()
+    + loadMoreResults()
+    + selectLanguage()
+  }
+
+  class "ProfileViewModel" as ProfileViewModel {
+    - authRepository: AuthRepository
+    - gitHubRepository: GitHubRepository
+    + isLoggedIn: LiveData<Boolean>
+    + userData: LiveData<ProfileUIModel>
+    + userRepositories: LiveData<List<Repository>>
+    + isLoading: LiveData<Boolean>
+    + error: LiveData<String>
+    + authStatus: LiveData<AuthStatus>
+    + checkLoginStatus()
+    + getUserProfile()
+    + getUserRepositories()
+    + logout()
+  }
+
+  class "AuthViewModel" as AuthViewModel {
+    - authRepository: AuthRepository
+    + authState: LiveData<AuthState>
+    + getAuthorizationUrl()
+    + getAccessToken()
+    + isLoggedIn()
+    + logout()
+  }
+
+  class "RepositoryViewModel" as RepositoryViewModel {
+    - gitHubRepository: GitHubRepository
+    + repository: LiveData<Repository>
+    + readme: LiveData<String>
+    + issues: LiveData<List<Issue>>
+    + isLoading: LiveData<Boolean>
+    + error: LiveData<String>
+    + loadRepository()
+    + loadReadme()
+    + loadIssues()
+    + createIssue()
+  }
+}
+
+package "仓库层" {
+  interface "GitHubRepository" as GitHubRepository {
+    + getTrendingRepositories(): LiveData<List<Repository>>
+    + getFeaturedTopics(): LiveData<List<Topic>>
+    + searchRepositories(): LiveData<List<Repository>>
+    + getUserProfile(): User
+    + getUserRepositories(): List<Repository>
+    + getRepositoryDetails(): Repository
+    + getRepositoryIssues(): List<Issue>
+    + createIssue(): Issue
+    + getIssueDetail(): Issue
+    + refreshHomeData()
+    + clearExpiredData()
+    + getRepositoryReadme(): String
+  }
+
+  class "GitHubRepositoryImpl" as GitHubRepositoryImpl {
+    - gitHubService: GitHubService
+    - database: GitHubDatabase
+    - repositoryDao: RepositoryDao
+    - topicDao: TopicDao
+  }
+
+  interface "AuthRepository" as AuthRepository {
+    + getAuthorizationUrl(): String
+    + getAccessToken(code: String): AccessToken
+    + saveAccessToken(token: String)
+    + getAccessToken(): String?
+    + saveUserId(userId: Long)
+    + getUserId(): Long
+    + saveUserLogin(login: String)
+    + getUserLogin(): String?
+    + isLoggedIn(): Boolean
+    + logout()
+  }
+
+  class "AuthRepositoryImpl" as AuthRepositoryImpl {
+    - authService: AuthService
+    - tokenManager: TokenManager
+  }
+}
+
+package "网络层" {
+  interface "GitHubService" as GitHubService {
+    + searchRepositories(): SearchResponse
+    + searchTopics(): TopicsResponse
+    + getTrendingRepositories(): List<Repository>
+    + getUserProfile(): User
+    + getUserRepositories(): List<Repository>
+    + getRepositoryDetails(): Repository
+    + getRepositoryIssues(): List<Issue>
+    + createIssue(): Issue
+    + getIssueDetail(): Issue
+    + getRepositoryReadme(): ReadmeResponse
+  }
+
+  interface "AuthService" as AuthService {
+    + getAccessToken(): AccessToken
+  }
+}
+
+package "数据模型" {
+  class "Repository" as Repository {
+    + id: Long
+    + name: String
+    + fullName: String
+    + description: String
+    + owner: Owner
+    + stargazersCount: Int
+    + forksCount: Int
+    + watchersCount: Int
+    + language: String
+    + defaultBranch: String
+    + createdAt: String
+    + updatedAt: String
+    + htmlUrl: String
+    + openIssues: Int
+    + license: License?
+  }
+
+  class "User" as User {
+    + id: Long
+    + login: String
+    + name: String
+    + avatarUrl: String
+    + bio: String
+    + publicRepos: Int
+    + followers: Int
+    + following: Int
+    + createdAt: String
+  }
+
+  class "Issue" as Issue {
+    + id: Long
+    + number: Int
+    + title: String
+    + body: String
+    + state: String
+    + user: Owner
+    + createdAt: String
+    + updatedAt: String
+    + comments: Int
+  }
+
+  class "AccessToken" as AccessToken {
+    + accessToken: String
+    + tokenType: String
+    + scope: String
+  }
+}
+
+' 关系
+Fragment <|-- HomeFragment
+Fragment <|-- SearchFragment
+Fragment <|-- ProfileFragment
+Fragment <|-- RepositoryDetailFragment
+
+ViewModel <|-- HomeViewModel
+ViewModel <|-- SearchViewModel
+ViewModel <|-- ProfileViewModel
+ViewModel <|-- AuthViewModel
+ViewModel <|-- RepositoryViewModel
+
+GitHubRepository <|.. GitHubRepositoryImpl
+AuthRepository <|.. AuthRepositoryImpl
+
+HomeFragment --> HomeViewModel
+SearchFragment --> SearchViewModel
+ProfileFragment --> ProfileViewModel
+ProfileFragment --> AuthViewModel
+RepositoryDetailFragment --> RepositoryViewModel
+
+HomeViewModel --> GitHubRepository
+SearchViewModel --> GitHubRepository
+ProfileViewModel --> GitHubRepository
+ProfileViewModel --> AuthRepository
+AuthViewModel --> AuthRepository
+RepositoryViewModel --> GitHubRepository
+
+GitHubRepositoryImpl --> GitHubService
+AuthRepositoryImpl --> AuthService
+
+' 添加说明注释
+note top of Fragment
+  所有UI界面的基类
+end note
+
+note top of ViewModel
+  所有ViewModel的基类，
+  提供UI状态管理和数据处理
+end note
+
+note right of HomeViewModel
+  处理首页数据，包括热门仓库
+  和推荐话题的加载和展示
+end note
+
+note right of SearchViewModel
+  处理搜索相关逻辑，支持分页
+  加载和筛选功能
+end note
+
+note right of ProfileViewModel
+  处理用户个人信息和仓库列表，
+  同时管理用户登录状态
+end note
+
+note right of GitHubRepository
+  定义与GitHub API交互的核心接口，
+  提供数据获取和缓存能力
+end note
+
+note right of AuthRepository
+  负责处理用户认证相关逻辑，
+  包括OAuth登录和令牌管理
+end note
+
+@enduml 

@@ -13,12 +13,10 @@
 - 优雅的错误处理，如网络中断时的提示
 
 ## Download
-/release/app-release.apk
+https://github.com/robinfjb/githubdemo/blob/main/release/app-release.apk
 
 ## Screenshots
-![Screenshot 1](screenshots/1.png) ![Screenshot 2](screenshots/2.png) ![Screenshot 3](screenshots/3.png)
-![Screenshot 4](screenshots/4.png) ![Screenshot 5](screenshots/5.png) ![Screenshot 6](screenshots/6.png)
-![Screenshot 7](screenshots/7.png)
+![Screenshot 1](screenshots/1.png) ![Screenshot 2](screenshots/2.png) ![Screenshot 3](screenshots/3.png) ![Screenshot 4](screenshots/4.png) ![Screenshot 5](screenshots/5.png) ![Screenshot 6](screenshots/6.png) ![Screenshot 7](screenshots/7.png)
 
 ## 技术栈
 - 使用Kotlin开发，支持API Level 29+
@@ -36,31 +34,9 @@
 3. 在`app/src/main/java/com/example/githubdemo/util/Constants.kt`文件中，配置你的GitHub OAuth应用程序的CLIENT_ID和CLIENT_SECRET
 4. 运行应用程序
 
-## 测试
-本项目包含单元测试和UI测试：
-
-- 单元测试: `./gradlew test`
-- UI测试: `./gradlew connectedAndroidTest`
-
 ## UML图
-+------------------+        +----------------+        +------------------+
-|    Fragment      |        |   ViewModel    |        |    Repository    |
-+------------------+        +----------------+        +------------------+
-| - binding        |<------>| - liveData     |<------>| - apiService     |
-| - viewModel      |        | - repository   |        | - localDatabase  |
-| + setupViews()   |        | + loadData()   |        | + fetchData()    |
-| + observeData()  |        | + updateData() |        | + cacheData()    |
-+------------------+        +----------------+        +------------------+
-^                          ^                         ^
-|                          |                         |
-+------------------+        +----------------+        +------------------+
-|RepositoryDetail  |        |RepositoryDetail|        |GitHubRepository  |
-|    Fragment      |        |   ViewModel    |        |      Impl        |
-+------------------+        +----------------+        +------------------+
-| - issueAdapter   |        | - repoData     |        | - gitHubService  |
-| - readmeView     |        | - issues       |        | - database       |
-| + onIssueCreated |        | - readmeContent|        | + getReadme()    |
-+------------------+        +----------------+        +------------------+
+![class-diagram](resource/class_diagram.png) ![mvvm_diagram](resource/mvvm_diagram.png) ![simplified_diagram](resource/simplified_diagram.png)
+
 
 ## 许可证
 
