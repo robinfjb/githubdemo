@@ -1,6 +1,6 @@
 package com.example.githubdemo.data.repository
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import com.example.githubdemo.data.model.Issue
 import com.example.githubdemo.data.model.IssueRequest
 import com.example.githubdemo.data.model.Repository
@@ -15,12 +15,12 @@ interface GitHubRepository {
     /**
      * 获取热门仓库
      */
-    fun getTrendingRepositories(): LiveData<List<Repository>>
+    fun getTrendingRepositories(): Flow<List<Repository>>
     
     /**
      * 获取热门话题
      */
-    fun getFeaturedTopics(): LiveData<List<Topic>>
+    fun getFeaturedTopics(): Flow<List<Topic>>
     
     /**
      * 搜索仓库
@@ -30,7 +30,7 @@ interface GitHubRepository {
         sort: String = "stars", 
         page: Int = 1, 
         perPage: Int = 30
-    ): LiveData<List<Repository>>
+    ): Flow<List<Repository>>
     
     /**
      * 获取用户个人资料

@@ -8,6 +8,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.githubdemo.GitHubApp
@@ -16,6 +17,8 @@ import com.example.githubdemo.databinding.FragmentSearchBinding
 import com.example.githubdemo.ui.repository.RepositoryDetailFragment
 import com.example.githubdemo.ui.search.adapter.RepositoryAdapter
 import com.google.android.material.chip.Chip
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 /**
  * 搜索Fragment
@@ -80,8 +83,8 @@ class SearchFragment : Fragment() {
                 
                 // 判断是否滑动到了底部，需要加载更多数据
                 if (!isLoadingMore && 
-                    viewModel.hasMoreData.value == true && 
-                    !viewModel.isLoading.value!! &&
+                    viewModel.hasMoreData.value && 
+                    !viewModel.isLoading.value &&
                     (visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 5 && 
                     firstVisibleItemPosition >= 0) {
                     
@@ -132,33 +135,39 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        // 观察搜索结果
-        viewModel.searchResults.observe(viewLifecycleOwner) { repositories ->
-            repositoryAdapter.submitList(repositories)
-            binding.resultsTitle.visibility = if (repositories.isNotEmpty()) View.VISIBLE else View.GONE
-            binding.emptyResultsTextView.visibility = if (repositories.isEmpty() && !viewModel.isLoading.value!!) View.VISIBLE else View.GONE
-        }
-        
-        // 观察加载状态
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading && !isLoadingMore) View.VISIBLE else View.GONE
-            
-            if (!isLoading) {
-                // 重置加载更多状态
-                isLoadingMore = false
-                binding.loadMoreProgressBar.visibility = View.GONE
-                
-                if (viewModel.searchResults.value?.isEmpty() == true) {
-                    binding.emptyResultsTextView.visibility = View.VISIBLE
-                }
-            } else if (!isLoadingMore) {
-                binding.emptyResultsTextView.visibility = View.GONE
+        // 使用 Flow 收集搜索结果
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.searchResults.collectLatest { repositories ->
+                repositoryAdapter.submitList(repositories)
+                binding.resultsTitle.visibility = if (repositories.isNotEmpty()) View.VISIBLE else View.GONE
+                binding.emptyResultsTextView.visibility = if (repositories.isEmpty() && !viewModel.isLoading.value) View.VISIBLE else View.GONE
             }
         }
         
-        // 观察是否还有更多数据
-        viewModel.hasMoreData.observe(viewLifecycleOwner) { hasMoreData ->
-            binding.noMoreDataTextView.visibility = if (!hasMoreData && viewModel.searchResults.value?.isNotEmpty() == true) View.VISIBLE else View.GONE
+        // 使用 Flow 收集加载状态
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.isLoading.collectLatest { isLoading ->
+                binding.progressBar.visibility = if (isLoading && !isLoadingMore) View.VISIBLE else View.GONE
+                
+                if (!isLoading) {
+                    // 重置加载更多状态
+                    isLoadingMore = false
+                    binding.loadMoreProgressBar.visibility = View.GONE
+                    
+                    if (viewModel.searchResults.value.isEmpty()) {
+                        binding.emptyResultsTextView.visibility = View.VISIBLE
+                    }
+                } else if (!isLoadingMore) {
+                    binding.emptyResultsTextView.visibility = View.GONE
+                }
+            }
+        }
+        
+        // 使用 Flow 收集是否还有更多数据
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.hasMoreData.collectLatest { hasMoreData ->
+                binding.noMoreDataTextView.visibility = if (!hasMoreData && viewModel.searchResults.value.isNotEmpty()) View.VISIBLE else View.GONE
+            }
         }
     }
 

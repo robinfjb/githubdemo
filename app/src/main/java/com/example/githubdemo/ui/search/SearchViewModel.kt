@@ -1,11 +1,12 @@
 package com.example.githubdemo.ui.search
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.githubdemo.data.model.Repository
 import com.example.githubdemo.data.repository.GitHubRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
@@ -14,16 +15,16 @@ import kotlinx.coroutines.launch
 class SearchViewModel(private val gitHubRepository: GitHubRepository) : ViewModel() {
 
     // 搜索结果
-    private val _searchResults = MutableLiveData<List<Repository>>(emptyList())
-    val searchResults: LiveData<List<Repository>> = _searchResults
+    private val _searchResults = MutableStateFlow<List<Repository>>(emptyList())
+    val searchResults: StateFlow<List<Repository>> = _searchResults
     
     // 加载状态
-    private val _isLoading = MutableLiveData<Boolean>(false)
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
     
     // 是否还有更多数据
-    private val _hasMoreData = MutableLiveData<Boolean>(true)
-    val hasMoreData: LiveData<Boolean> = _hasMoreData
+    private val _hasMoreData = MutableStateFlow(true)
+    val hasMoreData: StateFlow<Boolean> = _hasMoreData
     
     // 当前页码
     private var currentPage = 1
@@ -51,8 +52,8 @@ class SearchViewModel(private val gitHubRepository: GitHubRepository) : ViewMode
                 } else {
                     query
                 }
-                val results = gitHubRepository.searchRepositories(finalQuery, page = currentPage)
-                results.observeForever { repos ->
+                val resultsFlow = gitHubRepository.searchRepositories(finalQuery, page = currentPage)
+                resultsFlow.collectLatest { repos ->
                     _searchResults.value = repos
                     _isLoading.value = false
                     // 如果返回的结果少于每页数量，则认为没有更多数据
@@ -81,7 +82,7 @@ class SearchViewModel(private val gitHubRepository: GitHubRepository) : ViewMode
      * 加载更多数据
      */
     fun loadMoreResults() {
-        if (!_hasMoreData.value!! || _isLoading.value!!) {
+        if (!_hasMoreData.value || _isLoading.value) {
             return
         }
         
@@ -96,9 +97,9 @@ class SearchViewModel(private val gitHubRepository: GitHubRepository) : ViewMode
                 } else {
                     currentQuery
                 }
-                val results = gitHubRepository.searchRepositories(currentQuery, page = currentPage)
-                results.observeForever { newRepos ->
-                    val currentList = _searchResults.value ?: emptyList()
+                val resultsFlow = gitHubRepository.searchRepositories(finalQuery, page = currentPage)
+                resultsFlow.collectLatest { newRepos ->
+                    val currentList = _searchResults.value
                     val updatedList = currentList + newRepos
                     _searchResults.value = updatedList
                     _isLoading.value = false

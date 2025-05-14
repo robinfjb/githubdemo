@@ -1,11 +1,11 @@
 package com.example.githubdemo.ui.auth
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.githubdemo.data.model.AccessToken
 import com.example.githubdemo.data.repository.AuthRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
  */
 class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     
-    private val _authState = MutableLiveData<AuthState>()
-    val authState: LiveData<AuthState> = _authState
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Unauthenticated)
+    val authState: StateFlow<AuthState> = _authState
     
     /**
      * 获取GitHub认证URL

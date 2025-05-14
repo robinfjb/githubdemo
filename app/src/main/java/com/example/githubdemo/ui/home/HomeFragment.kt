@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.githubdemo.GitHubApp
 import com.example.githubdemo.R
@@ -15,6 +16,8 @@ import com.example.githubdemo.ui.home.adapter.TopicAdapter
 import com.example.githubdemo.ui.repository.RepositoryDetailFragment
 import com.example.githubdemo.ui.search.SearchFragment
 import com.example.githubdemo.ui.home.adapter.ItemDecorationWithMargins
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 /**
  * 首页Fragment，显示热门仓库和话题
@@ -80,21 +83,29 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.loading.collectLatest { isLoading ->
+                binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            }
+        }
+        
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.error.collectLatest { hasError ->
+                binding.errorTextView.visibility = if (hasError) View.VISIBLE else View.GONE
+                binding.retryButton.visibility = if (hasError) View.VISIBLE else View.GONE
+            }
         }
 
-        viewModel.error.observe(viewLifecycleOwner) { hasError ->
-            binding.errorTextView.visibility = if (hasError) View.VISIBLE else View.GONE
-            binding.retryButton.visibility = if (hasError) View.VISIBLE else View.GONE
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.trendingRepositories.collectLatest { repositories ->
+                repositoryAdapter.submitList(repositories)
+            }
         }
 
-        viewModel.trendingRepositories.observe(viewLifecycleOwner) { repositories ->
-            repositoryAdapter.submitList(repositories)
-        }
-
-        viewModel.featuredTopics.observe(viewLifecycleOwner) { topics ->
-            topicAdapter.submitList(topics)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.featuredTopics.collectLatest { topics ->
+                topicAdapter.submitList(topics)
+            }
         }
     }
 

@@ -1,13 +1,14 @@
 package com.example.githubdemo.ui.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import com.example.githubdemo.data.model.Repository
 import com.example.githubdemo.data.model.Topic
 import com.example.githubdemo.data.repository.GitHubRepository
-import kotlinx.coroutines.launch
 
 /**
  * 首页ViewModel
@@ -15,18 +16,18 @@ import kotlinx.coroutines.launch
 class HomeViewModel(private val gitHubRepository: GitHubRepository) : ViewModel() {
 
     // 热门仓库数据
-    val trendingRepositories: LiveData<List<Repository>> = gitHubRepository.getTrendingRepositories()
+    val trendingRepositories: Flow<List<Repository>> = gitHubRepository.getTrendingRepositories()
     
     // 热门话题数据
-    val featuredTopics: LiveData<List<Topic>> = gitHubRepository.getFeaturedTopics()
+    val featuredTopics: Flow<List<Topic>> = gitHubRepository.getFeaturedTopics()
     
     // 加载状态
-    private val _loading = MutableLiveData<Boolean>()
-    val loading: LiveData<Boolean> = _loading
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading
     
     // 错误状态
-    private val _error = MutableLiveData<Boolean>()
-    val error: LiveData<Boolean> = _error
+    private val _error = MutableStateFlow(false)
+    val error: StateFlow<Boolean> = _error
     
     init {
         loadData()

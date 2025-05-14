@@ -1,6 +1,6 @@
 package com.example.githubdemo.data.local.dao
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -23,7 +23,7 @@ interface TopicDao {
      * 获取所有热门话题
      */
     @Query("SELECT * FROM topics WHERE featured = 1 ORDER BY name ASC")
-    fun getFeaturedTopics(): LiveData<List<TopicEntity>>
+    fun getFeaturedTopics(): Flow<List<TopicEntity>>
     
     /**
      * 根据名称获取话题
@@ -39,7 +39,7 @@ interface TopicDao {
             "displayName LIKE '%' || :query || '%' OR " +
             "description LIKE '%' || :query || '%' " +
             "ORDER BY featured DESC, name ASC LIMIT :limit")
-    fun searchTopics(query: String, limit: Int = 50): LiveData<List<TopicEntity>>
+    fun searchTopics(query: String, limit: Int = 50): Flow<List<TopicEntity>>
     
     /**
      * 删除过期的数据

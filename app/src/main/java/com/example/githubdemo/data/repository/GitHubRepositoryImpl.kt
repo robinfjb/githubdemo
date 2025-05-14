@@ -1,8 +1,10 @@
 package com.example.githubdemo.data.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
-import androidx.lifecycle.liveData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
 import android.util.Base64
 import com.example.githubdemo.GitHubApp
 import com.example.githubdemo.data.local.GitHubDatabase
@@ -35,17 +37,14 @@ class GitHubRepositoryImpl(
     private val repositoryDao = database.repositoryDao()
     private val topicDao = database.topicDao()
 
-    override fun getTrendingRepositories(): LiveData<List<Repository>> {
+    override fun getTrendingRepositories(): Flow<List<Repository>> {
         return repositoryDao.getTrendingRepositories()
-            .map {
-                entities ->
-                entities.map {
-                    it.toRepository()
-                }
+            .map { entities ->
+                entities.map { it.toRepository() }
             }
     }
 
-    override fun getFeaturedTopics(): LiveData<List<Topic>> {
+    override fun getFeaturedTopics(): Flow<List<Topic>> {
         return topicDao.getFeaturedTopics()
             .map { entities -> entities.map { it.toTopic() } }
     }
@@ -55,31 +54,28 @@ class GitHubRepositoryImpl(
         sort: String,
         page: Int,
         perPage: Int
-    ): LiveData<List<Repository>> {
-        return liveData(Dispatchers.IO) {
-            try {
-                val response = gitHubService.searchRepositories(
-                    query = query, 
-                    sort = sort,
-                    page = page,
-                    perPage = perPage
-                )
-                val repositories = response.items
+    ): Flow<List<Repository>> {
+        return flow {
+            val response = gitHubService.searchRepositories(
+                query = query, 
+                sort = sort,
+                page = page,
+                perPage = perPage
+            )
+            val repositories = response.items
 
-                // 只有第一页数据需要缓存到数据库
-                if (page == 1) {
-                    withContext(Dispatchers.IO) {
-                        repositoryDao.insertRepositories(repositories.map { it.toEntity() })
-                    }
+            // 只有第一页数据需要缓存到数据库
+            if (page == 1) {
+                withContext(Dispatchers.IO) {
+                    repositoryDao.insertRepositories(repositories.map { it.toEntity() })
                 }
-
-                emit(repositories)
-            } catch (e: Exception) {
-                // 如果API调用失败，尝试从本地数据库获取结果
-                val localRepositories = repositoryDao.searchRepositories(query)
-                    .map { entities -> entities.map { it.toRepository() } }
-                emitSource(localRepositories)
             }
+
+            emit(repositories)
+        }.catch { e ->
+            // 如果API调用失败，尝试从本地数据库获取结果
+            emitAll(repositoryDao.searchRepositories(query)
+                .map { entities -> entities.map { it.toRepository() } })
         }
     }
 
